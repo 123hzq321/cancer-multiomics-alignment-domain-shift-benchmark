@@ -1,0 +1,112 @@
+\section{Methods}
+
+\subsection{Study design and analysis hierarchy}
+
+To avoid treating all analyses as equal sources of evidence, we organized the study into a primary benchmark, secondary stress tests and model comparisons, an exploratory scope screen, and one external-validation case study (Table~\ref{tab:study_design}). The five TCGA cancer-internal tasks were the only tasks used for the complete alignment, mismatch, model-family, Liquid/CfC, noise, and medical-interpretation workflow.
+
+\begin{center}
+\captionof{table}{Study design and interpretation hierarchy.}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}}
+\toprule
+Analysis tier & Data & Main purpose & Interpretation role \\
+\midrule
+Primary benchmark & Five TCGA cancer-internal tasks & Audit sample alignment and modality coverage & Main evidence base \\
+Stress test & Same five tasks & Simulate broken multi-omics sample pairing & Robustness and failure-mode analysis \\
+Model-family benchmark & Same five tasks & Compare seven classical and neural model families under 10-fold CV & Architecture comparison; effect-size oriented \\
+Exploratory scope screen & 10 TCGA PanCancer cohorts & Discover 21 candidate within-cancer clinical endpoints & Task landscape and difficulty screen only \\
+External case study & BRCA source and external cohorts & Quantify source-to-external cohort shift in an 83-gene marker space & BRCA-specific domain-shift example \\
+\bottomrule
+\end{tabular}
+\endgroup
+\label{tab:study_design}
+\end{center}
+
+\subsection{Modality coverage audit}
+
+For each cancer-internal task and modality, we counted the number of molecular features, the number of labelled rows with at least one observed feature, and the feature-level missing fraction. This audit was used to distinguish broadly observed core modalities from sparse modalities. Missing values were handled by training-split median imputation in all predictive models.
+
+\subsection{Sample-level alignment audit}
+
+Because the central stress test depends on whether the original multi-omics rows are sample-aligned, we performed an explicit cBioPortal-level sample audit before introducing any simulated mismatch. For each cancer-internal task, we counted labelled rows, unique \texttt{sampleId} values, duplicate sample rows, unique \texttt{patientId} values, patients with more than one labelled sample, primary solid tumor rows, and the fraction of rows with at least one observed feature in every core modality. Clinical labels stored at patient level were merged to molecular rows only through the corresponding \texttt{patientId}; because no patient contributed more than one labelled sample in the audited task tables, this merge did not create repeated patient-level labels across multiple tumor samples. The mismatch-core modality set was mRNA, GISTIC copy number, methylation, and mutation. The expanded-core modality set additionally included log2 copy number. This audit tests whether the modelling table is one row per labelled tumor sample and whether core molecular blocks are present at the sample level. It does not prove aliquot-level molecular provenance across portion, analyte, and aliquot barcodes; that distinction is treated as a limitation of using harmonized public cBioPortal tables.
+
+\subsection{Simulated sample-mismatch stress test}
+
+Let \(x_i^{(m)}\) denote modality \(m\) for sample \(i\). In an aligned multi-omics table, the row
+\[
+X_i = \{x_i^{(\mathrm{mRNA})}, x_i^{(\mathrm{CNA})}, x_i^{(\mathrm{methylation})}, x_i^{(\mathrm{mutation})}\}
+\]
+contains molecular features from the same tumor sample. To simulate sample-level multi-omics mismatch, we selected a fraction \(\rho \in \{0, 0.10, 0.25, 0.50, 0.75, 1.00\}\) of rows and independently permuted the non-mRNA modalities across those rows:
+\[
+\tilde{X}_i(\rho)=\{x_i^{(\mathrm{mRNA})}, x_{\pi_{\mathrm{CNA}}(i)}^{(\mathrm{CNA})}, x_{\pi_{\mathrm{meth}}(i)}^{(\mathrm{methylation})}, x_{\pi_{\mathrm{mut}}(i)}^{(\mathrm{mutation})}\}.
+\]
+This stress test preserves the marginal distribution of each modality but breaks the biological pairing between modalities for the affected rows. We evaluated two scenarios: mismatch introduced in the training set only, and mismatch introduced in the test set only.
+
+Each task was split into 70\% training and 30\% test sets using stratified sampling. Splitting was repeated with seeds 42, 43, and 44. We evaluated two practical baseline models: class-balanced logistic regression and ExtraTrees. The single-modality mRNA model served as a reference anchor. Macro F1 was the primary metric, with balanced accuracy and ROC-AUC reported as secondary metrics.
+
+To connect the Liquid/CfC applicability analysis with the alignment stress test, we repeated the mismatch experiment for Liquid/CfC and small-Liquid/CfC using the same mismatch rates and seeds. The 70\% training portion was internally split into training and validation subsets for neural early stopping. For training-mismatch experiments, non-mRNA modalities were permuted in the neural training subset while the validation and test sets remained aligned. For test-mismatch experiments, the neural model was trained on aligned data and evaluated on the mismatched test set.
+
+\subsection{Liquid/CfC model implementation}
+
+The Liquid/CfC models were implemented as modality-sequence neural fusion modules, not as temporal clinical models. Each omics block was first transformed by a modality-specific encoder consisting of a linear projection, ReLU activation, dropout, and layer normalization. A learned modality embedding was then added. The resulting sequence \(z_1,\ldots,z_T\) represented omics modalities in a fixed order. For the seven-model 10-fold benchmark, the order was mRNA, GISTIC copy number, log2 copy number, methylation, and mutation. For the mismatch stress test, the order was mRNA, GISTIC copy number, methylation, and mutation to match the perturbation core. We used this sequence only as a structured fusion device: the order lets the model update a shared state as each modality is observed, but it should not be interpreted as biological time.
+
+For a modality embedding \(z_t\) and hidden state \(h_{t-1}\), the implemented CfC-style update was
+\[
+r_t=\mathrm{softplus}\left(W_r[z_t,h_{t-1}]+b_r\right)+10^{-3},
+\]
+\[
+\alpha_t=1-\exp(-r_t\Delta t), \quad \Delta t=1,
+\]
+\[
+c_t=\tanh(W_x z_t+W_h h_{t-1}), \quad
+g_t=\sigma(W_g[z_t,h_{t-1}]+b_g),
+\]
+\[
+q_t=g_t\odot c_t+(1-g_t)\odot h_{t-1},
+\]
+\[
+h_t=(1-\alpha_t)\odot h_{t-1}+\alpha_t\odot q_t,
+\]
+with \(h_0=0\). The final hidden state was passed through layer normalization and a linear classifier. The full Liquid/CfC model used an embedding dimension of 64 and hidden dimension of 96. The small-Liquid/CfC model used an embedding dimension of 32 and hidden dimension of 48, reducing trainable parameters from 192,866--193,060 to 84,914--85,012 across the five tasks, or approximately 44\% of the full model size.
+
+Neural models were trained with class-weighted cross-entropy, AdamW, learning rate \(10^{-3}\), weight decay \(10^{-4}\), batch size 64, and gradient clipping at norm 5.0. In the 10-fold model-family benchmark, neural models used a maximum of 60 epochs and early-stopping patience of 8 epochs. In the Liquid/CfC mismatch stress test, the maximum was 35 epochs with patience 5. Early stopping used validation macro one-vs-rest ROC-AUC when defined and validation balanced accuracy otherwise.
+
+\subsection{Expanded baseline benchmark and statistical comparison}
+
+To address model-family baseline performance independently of the simulated mismatch experiment, we also performed 10-fold stratified cross-validation on the same five TCGA cancer-internal tasks using seven model families: elastic-net logistic regression, Random Forest, ExtraTrees, HistGradientBoosting, early-fusion multilayer perceptron (MLP), modality-sequence Liquid/CfC, and small-Liquid/CfC. The core aligned modalities were mRNA, GISTIC copy number, log2 copy number, methylation, and mutation; RPPA was excluded from this expanded benchmark because the coverage audit showed sparse RPPA observations.
+
+For each fold, preprocessing parameters were fitted only on the training portion. Neural models used an internal validation subset for early stopping. Macro F1 was the primary endpoint, and one-vs-rest macro ROC-AUC was reported as a secondary endpoint. For each task, we identified the highest mean macro F1 model and summarized its fold-level difference from the runner-up. We reported the mean paired fold-level F1 difference, bootstrap 95\% confidence intervals for that mean difference, and an exploratory Wilcoxon signed-rank test with an exact sign-test fallback when required. Because cross-validation folds are not independent biological samples, these \(p\) values were interpreted only as exploratory paired fold-level diagnostics, not as definitive population-level inferential tests. Holm-adjusted values were provided to avoid overemphasizing isolated fold-level contrasts. Finally, Gaussian noise was added to standardized test features to estimate a robustness elbow for the best model in each task.
+
+\subsection{BRCA domain-shift quantification}
+
+For the BRCA external-validation case study, we quantified source-to-external cohort shift in the common 83-gene expression marker space. The source domain was the TCGA-BRCA/METABRIC training split. For each external cohort, we computed two shift summaries.
+
+First, we fitted a logistic domain classifier to distinguish source samples from external samples using cross-validation. Because the sign of the domain classifier score is arbitrary, we report domain separability as
+\[
+A_{\mathrm{sep}}=\max(AUC, 1-AUC),
+\]
+so values near 0.5 indicate little separability and values closer to 1 indicate stronger cohort separability. Second, after median imputation and standardization fitted on the source domain, we computed the mean absolute difference between source and external feature means:
+\[
+D_{\mathrm{mean}} = \frac{1}{p}\sum_{j=1}^{p}\left|\bar{z}_{j,\mathrm{external}}-\bar{z}_{j,\mathrm{source}}\right|.
+\]
+We then trained logistic regression and ExtraTrees subtype classifiers on the source training split and evaluated them on the source validation split and the three external cohorts.
+
+\subsection{Ten-cancer PanCancer extension}
+
+For the 10-cancer PanCancer extension, we computed modality coverage by cancer type and assay. We also quantified how easily each cancer type could be separated from the remaining nine cancer types using mRNA features alone. For each cancer type \(c\), we fitted a one-vs-rest logistic classifier and reported cross-validated ROC-AUC:
+\[
+A_c = \mathrm{AUC}\left(\hat{p}(y=c), \mathbb{1}\{y=c\}\right).
+\]
+Finally, we compared the best macro F1 from the 10-class PanCancer cancer-type task with the best macro F1 values from the five within-cancer endpoint tasks. This comparison was intended to distinguish between-cancer tissue identity signals from the more difficult clinical or molecular endpoint prediction tasks within a cancer type.
+
+\subsection{Exploratory clinical endpoint discovery}
+
+To avoid limiting the scope analysis to the five curated tasks, we systematically queried TCGA PanCancer clinical attributes for BRCA, COADREAD, GBM, HNSC, KIRC, LUAD, LUSC, OV, PRAD, and UCEC. Candidate endpoints were retained when they could be mapped to a clinically interpretable classification target and each retained class had at least 40 labelled samples. Stage was harmonized as early versus advanced disease, pathologic T stage as low versus high local extension, histologic grade as low versus high grade, and subtype labels as cancer-specific molecular or histologic subtype classes.
+
+For a lightweight difficulty estimate, each candidate endpoint was evaluated with three-fold stratified cross-validation using two baselines: elastic-net logistic regression and ExtraTrees. Missing values were median-imputed inside each training fold. To reduce dimensionality and keep the expanded screen comparable across cancers, the top 300 features were selected within each training fold using univariate ANOVA \(F\)-statistics before model fitting. Macro F1 was the primary screening metric. Because endpoints were discovered and screened within the same public resource, this analysis is subject to selection bias and was interpreted only as an exploratory task-availability and apparent-difficulty landscape, not as validated evidence for the 21 endpoints.
+
+\subsection{Medical interpretation mapping}
+
+For each cancer-internal endpoint, we summarized the clinical or biological target, the expected dominant biology, why multi-omics information may be relevant, and how the observed model pattern should be interpreted medically. This table was not used as a statistical test; it was included to make the benchmark clinically interpretable and to distinguish biologically plausible model behavior from leaderboard-style model ranking.

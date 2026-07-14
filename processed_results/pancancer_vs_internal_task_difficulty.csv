@@ -1,0 +1,7 @@
+analysis,task,best_model,macro_f1_mean,macro_f1_sd,task_family
+PanCancer cancer-type classification,10 cancer types,tcn_modality_sequence__expression_last,0.9903738860954622,0.0005831915147643,between-cancer
+Within-cancer endpoint prediction,HNSC_HPV_status,extra_trees,0.9505374082007344,0.0458613219779718,within-cancer
+Within-cancer endpoint prediction,UCEC_molecular_subtype,logistic_elasticnet,0.9134089937288068,0.0502130147582706,within-cancer
+Within-cancer endpoint prediction,COADREAD_molecular_subtype,extra_trees,0.9059519504307944,0.0494794898646607,within-cancer
+Within-cancer endpoint prediction,PRAD_pathologic_T_stage,small_liquid_cfc_modality_sequence,0.707089365679753,0.0650778666078964,within-cancer
+Within-cancer endpoint prediction,KIRC_grade_binary,hist_gradient_boosting,0.6996168115238911,0.0157512524980743,within-cancer

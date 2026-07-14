@@ -1,0 +1,40 @@
+\section{Data}
+
+\subsection{TCGA cancer-internal tasks}
+
+We used five TCGA PanCancer Atlas cancer-internal prediction tasks assembled from cBioPortal-accessible molecular and clinical data \cite{cerami_cbioportal_2012,gao_cbioportal_2013,hoadley_pancancer_2018}. Each task was defined within a single cancer type, so the model predicted a clinically or biologically meaningful endpoint rather than cancer type itself. The tasks were UCEC molecular subtype, COADREAD molecular subtype, HNSC HPV status, KIRC histologic grade, and PRAD pathologic T stage \cite{tcga_ucec_2013,tcga_coadread_2012,tcga_hnsc_2015,tcga_kirc_2013,tcga_prad_2015}. Table~\ref{tab:tasks} summarizes the task definitions.
+
+\begin{table}[ht]
+\centering
+\caption{Cancer-internal tasks used for the alignment and mismatch benchmark.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllr}
+\toprule
+Task & Cancer type & Prediction target & Labelled samples \\
+\midrule
+UCEC molecular subtype & UCEC & CN-high, CN-low, MSI, POLE & 507 \\
+COADREAD molecular subtype & COADREAD & CIN, MSI, genome-stable & 449 \\
+HNSC HPV status & HNSC & HPV-positive versus HPV-negative & 487 \\
+KIRC grade & KIRC & G1/G2 versus G3/G4 & 504 \\
+PRAD pathologic T stage & PRAD & T2 versus T3/T4 & 487 \\
+\bottomrule
+\end{tabular}
+}
+\label{tab:tasks}
+\end{table}
+
+The available molecular feature blocks were mRNA expression, GISTIC copy-number alteration, log2 copy-number alteration, methylation, RPPA protein abundance, and mutation. The mismatch stress test used a core multi-omics feature set consisting of mRNA, GISTIC copy-number alteration, methylation, and mutation. RPPA was excluded from the core stress test because its feature-level observed fraction was low across the five tasks.
+
+\subsection{Ten-cancer PanCancer audit}
+
+To strengthen the multi-cancer reliability analysis, we also audited the full 10-cancer TCGA PanCancer table used in the broader project. This table contained 5957 primary tumor samples from BRCA, COADREAD, GBM, HNSC, KIRC, LUAD, LUSC, OV, PRAD, and UCEC. The same IMPACT468-based molecular feature blocks were available: mRNA expression, GISTIC copy-number alteration, log2 copy-number alteration, methylation, RPPA, and mutation. This audit was not used to claim clinical utility of cancer-type classification; instead, it served to show how strongly cancer identity structures the molecular feature space and how modality coverage differs across cancer types.
+
+We further used the same 10-cancer TCGA PanCancer clinical records to discover additional within-cancer endpoint candidates. The search covered clinically interpretable labels that could be harmonized across at least one cancer type, including low- versus high-grade disease, molecular or histologic subtype, early- versus advanced-stage disease, and low- versus high-pathologic T stage. These expanded endpoints were used only as an exploratory task landscape and difficulty screen; the five curated cancer-internal tasks remained the deeply analysed alignment, mismatch, and model-family benchmark.
+
+\subsection{BRCA external-validation case study}
+
+For the cohort-shift component, we used a BRCA marker-panel case study rather than a pan-cancer external-validation analysis. TCGA-BRCA and METABRIC formed the source training/validation pool, and three external BRCA cohorts were evaluated: CPTAC 2020, SMC 2018, and GSE96058/SCAN-B \cite{tcga_brca_2012,curtis_metabric_2012,pereira_metabric_2016,krug_cptac_2020,gse96058}. The common feature space for the shift analysis was an 83-gene expression marker panel. The prediction target was a five-class PAM50-like molecular subtype label: Basal, Her2, LumA, LumB, or Normal.
+
+\subsection{Sample unit and alignment key}
+
+All tables were represented as one row per labelled tumor sample. The primary alignment key was \texttt{sampleId}. Patient-level labels were merged to sample-level molecular rows through \texttt{patientId} only when the original clinical label was patient-level. This design ensured that all molecular blocks in a row were intended to describe the same tumor sample before any simulated mismatch was introduced.

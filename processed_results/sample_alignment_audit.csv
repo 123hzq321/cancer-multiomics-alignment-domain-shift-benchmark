@@ -1,0 +1,6 @@
+task,labelled_rows,unique_sample_ids,duplicate_sample_rows,unique_patient_ids,patients_with_multiple_labelled_samples,primary_solid_tumor_rows,rows_with_complete_mismatch_core,complete_mismatch_core_fraction,rows_with_complete_expanded_core,complete_expanded_core_fraction,rows_with_rppa_observed,rppa_sample_observed_fraction
+UCEC_molecular_subtype,507,507,0,507,0,507,507,1.0,507,1.0,405,0.7988165680473372
+COADREAD_molecular_subtype,449,449,0,449,0,449,449,1.0,449,1.0,356,0.7928730512249443
+HNSC_HPV_status,487,487,0,487,0,487,487,1.0,487,1.0,202,0.41478439425051333
+KIRC_grade_binary,504,504,0,504,0,504,498,0.9880952380952381,498,0.9880952380952381,451,0.8948412698412699
+PRAD_pathologic_T_stage,487,487,0,487,0,487,481,0.9876796714579056,481,0.9876796714579056,345,0.7084188911704312

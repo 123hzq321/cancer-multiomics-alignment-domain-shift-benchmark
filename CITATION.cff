@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "Cancer Multi-Omics Alignment and Domain-Shift Benchmark"
+message: "If you use this repository, please cite the associated manuscript and repository."
+authors:
+  - family-names: Hu
+    given-names: Zhequan
+  - family-names: Bi
+    given-names: Xingang
+date-released: 2026-07-15
+repository-code: "TO_BE_ADDED_AFTER_GITHUB_PUBLICATION"
+license: MIT

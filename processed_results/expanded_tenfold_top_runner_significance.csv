@@ -1,0 +1,6 @@
+task,best_model,second_model,top_wins,runner_up_wins,ties,mean_f1_diff,ci95_low,ci95_high,wilcoxon_or_sign_p,holm_p
+COADREAD_molecular_subtype,extra_trees,small_liquid_cfc_modality_sequence,5,5,0,0.0048489439207441,-0.0431498274012369,0.0513910688553214,1.0,1.0
+HNSC_HPV_status,logistic_elasticnet,hist_gradient_boosting,5,2,3,0.0159193261089963,-0.0141486292265135,0.0470432788117051,0.375,1.0
+KIRC_grade_binary,random_forest,extra_trees,4,4,2,0.0122185634143827,-0.0057047702749714,0.030996543989109,0.3125,1.0
+PRAD_pathologic_T_stage,random_forest,hist_gradient_boosting,7,3,0,0.0021015498432677,-0.0451047076814905,0.0388921144564005,0.431640625,1.0
+UCEC_molecular_subtype,extra_trees,logistic_elasticnet,7,3,0,0.0053317737739358,-0.0390614224257429,0.0470783484335633,0.6953125,1.0

@@ -1,0 +1,52 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\setlength{\emergencystretch}{3em}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\title{Sample Alignment and Cohort Shift as Determinants\\of Cancer Multi-Omics Prediction Reliability:\\A Benchmark and Stress-Test Study}
+\author{
+Zhequan Hu\textsuperscript{1},
+Xingang Bi\textsuperscript{1,*}\\
+\textsuperscript{1}Department of Urology, Cancer Hospital, Chinese Academy of Medical Sciences,\\
+Beijing, China\\
+\textsuperscript{*}Corresponding author: Professor Xingang Bi, bixingang@csco.org.cn
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\textbf{Background:} Cancer multi-omics prediction studies often emphasize model scores, but their reliability also depends on whether omics layers are aligned to the same tumor sample, whether modalities have comparable coverage, and whether external cohorts match the source cohort. We designed a data-centric benchmark with a predefined analysis hierarchy: five TCGA cancer-internal tasks as the primary benchmark, simulated sample-mismatch stress tests, a seven-model 10-fold model-family benchmark, an exploratory 10-cancer endpoint landscape screen, and a BRCA external-validation case study.
+
+\textbf{Results:} The primary tasks covered UCEC molecular subtype, COADREAD molecular subtype, HNSC HPV status, KIRC grade, and PRAD pathologic T stage. At the cBioPortal sample-identifier level, all five task tables contained one unique labelled tumor-sample row per patient, no duplicate sample identifiers, and at least 98.8\% complete core-modality coverage. Simulated mismatch of non-mRNA omics rows reduced macro F1 in a task- and model-dependent manner, including drops in both tree-based and neural fusion comparators. In the seven-model 10-fold benchmark, the leading model family varied by task; exploratory fold-level effect sizes did not support a universal architecture winner. The exploratory endpoint screen identified 21 candidate within-cancer tasks across the 10 TCGA cohorts, but these were used only to map task availability and apparent difficulty. In the BRCA case study, CPTAC 2020 was more separable from the TCGA/METABRIC source distribution than SCAN-B or SMC in the marker-expression space, and external macro F1 varied by cohort and model.
+
+\textbf{Conclusions:} Within these public benchmark settings, sample alignment, modality coverage, endpoint biology, and cohort shift were major determinants of multi-omics prediction reliability. Future cancer multi-omics benchmarks should report alignment audits and mismatch stress tests alongside model scores.
+\end{abstract}
+
+\noindent\textbf{Keywords:} multi-omics; sample alignment; domain shift; cancer prediction; TCGA; external validation; benchmark
+
+\input{sections/introduction}
+\input{sections/data}
+\input{sections/methods}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/availability}
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}
