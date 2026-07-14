@@ -6,6 +6,8 @@ This repository supports the manuscript:
 
 The repository is intentionally data-centric. Liquid/CfC is included as one neural fusion comparator, not as the main claim of the study. The central benchmark asks how sample alignment, modality coverage, sample-mismatch stress tests, model-family baselines, and BRCA external cohort shift affect the reliability of cancer multi-omics prediction.
 
+Public repository URL: <https://github.com/123hzq321/cancer-multiomics-alignment-domain-shift-benchmark>
+
 ## Study Structure
 
 | Tier | Data | Purpose |
@@ -42,4 +44,4 @@ Large source molecular matrices are not redistributed here. The repository inclu
 
 ## Citation
 
-If this repository is used before journal publication, please cite the manuscript title and repository URL. A Zenodo DOI should be added after public archiving.
+If this repository is used before journal publication, please cite the manuscript title and repository URL.

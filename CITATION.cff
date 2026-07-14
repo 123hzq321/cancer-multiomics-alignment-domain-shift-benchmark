@@ -7,5 +7,5 @@ authors:
   - family-names: Bi
     given-names: Xingang
 date-released: 2026-07-15
-repository-code: "TO_BE_ADDED_AFTER_GITHUB_PUBLICATION"
+repository-code: "https://github.com/123hzq321/cancer-multiomics-alignment-domain-shift-benchmark"
 license: MIT
