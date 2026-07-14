@@ -49,33 +49,26 @@ At the full PanCancer level, mutation, copy-number, and methylation features had
 
 Across the 10 TCGA PanCancer cohorts, the exploratory clinical endpoint screen identified 21 candidate within-cancer tasks with sufficient class support (Figure~\ref{fig:expanded_scope_availability}). These included four grade tasks, four molecular or histologic subtype tasks, six early- versus advanced-stage tasks, and seven pathologic T-stage tasks. The available task count differed by cancer type: BRCA, COADREAD, HNSC, KIRC, UCEC, LUAD, LUSC, OV, and PRAD each contributed at least one clinically interpretable endpoint, whereas GBM did not meet the predefined endpoint and class-count criteria in this screen.
 
-\begin{center}
-\centering
-\begin{minipage}{\textwidth}
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.90\textwidth]{figures/expanded_scope_task_availability.png}
-\captionof{figure}{Expanded within-cancer endpoint availability across the 10 TCGA PanCancer cohorts. Candidate tasks were retained only when labels could be harmonized into a clinically interpretable endpoint and each retained class had at least 40 labelled samples.}
+\caption{Expanded within-cancer endpoint availability across the 10 TCGA PanCancer cohorts. Candidate tasks were retained only when labels could be harmonized into a clinically interpretable endpoint and each retained class had at least 40 labelled samples.}
 \label{fig:expanded_scope_availability}
-\end{minipage}
-\end{center}
+\end{figure}
 
 The lightweight three-fold baseline screen showed substantial variation in endpoint difficulty (Figure~\ref{fig:expanded_scope_f1}; Table~\ref{tab:expanded_scope}). Molecular or histologic subtype tasks were the most learnable group, with best-task macro F1 values ranging from 0.8178 to 0.9387. Grade prediction was heterogeneous, ranging from 0.5582 in OV to 0.8341 in UCEC. Stage and pathologic T-stage tasks were generally harder, with best-task macro F1 ranges of 0.5152--0.6893 and 0.5050--0.7049, respectively. These results expand the benchmark from a small set of hand-curated endpoints to a broader map of candidate task availability and difficulty while preserving the main manuscript's focus on alignment, mismatch sensitivity, and cohort shift.
 
-\begin{center}
-\centering
-\begin{minipage}{\textwidth}
+\begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/expanded_scope_endpoint_f1.png}
-\captionof{figure}{Quick baseline difficulty screen for expanded within-cancer endpoints. Values show the better macro F1 of elastic-net logistic regression and ExtraTrees under three-fold cross-validation with training-fold feature selection.}
+\caption{Quick baseline difficulty screen for expanded within-cancer endpoints. Values show the better macro F1 of elastic-net logistic regression and ExtraTrees under three-fold cross-validation with training-fold feature selection.}
 \label{fig:expanded_scope_f1}
-\end{minipage}
-\end{center}
+\end{figure}
 
-\begin{center}
+\begin{table}[ht]
 \centering
-\begin{minipage}{\textwidth}
-\centering
-\captionof{table}{Expanded endpoint families discovered across the 10-cancer TCGA PanCancer clinical screen. Macro F1 ranges use the better of elastic-net logistic regression and ExtraTrees for each task in the lightweight three-fold screen.}
+\caption{Expanded endpoint families discovered across the 10-cancer TCGA PanCancer clinical screen. Macro F1 ranges use the better of elastic-net logistic regression and ExtraTrees for each task in the lightweight three-fold screen.}
+\label{tab:expanded_scope}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrl}
 \toprule
@@ -88,9 +81,7 @@ Pathologic T stage low vs high & 7 & 7 & 0.5050--0.7049 & PRAD pathologic T stag
 \bottomrule
 \end{tabular}
 }
-\label{tab:expanded_scope}
-\end{minipage}
-\end{center}
+\end{table}
 
 \subsection{Simulated sample mismatch reduces multi-omics prediction performance}
 
